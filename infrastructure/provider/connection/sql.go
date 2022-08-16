@@ -6,6 +6,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 const (
@@ -25,12 +26,18 @@ func NewDBConnection(config *config.Config) (*gorm.DB, error) {
 		Timezone: config.Database.DBTimeZone,
 	}
 
+	gormConfig := &gorm.Config{}
+
+	if config.Database.DBLog {
+		gormConfig.Logger = logger.Default.LogMode(logger.Info)
+	}
+
 	switch config.Database.DBDriver {
 	case driverMysql:
-		return gorm.Open(mysql.Open(dsn.ToMySQL()), &gorm.Config{})
+		return gorm.Open(mysql.Open(dsn.ToMySQL()), gormConfig)
 
 	case driverPostgres:
-		return gorm.Open(postgres.Open(dsn.ToPostgres()), &gorm.Config{})
+		return gorm.Open(postgres.Open(dsn.ToPostgres()), gormConfig)
 
 	default:
 		return nil, errors.New("common.error.unknown_database_driver")

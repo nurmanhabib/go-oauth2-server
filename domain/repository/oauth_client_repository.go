@@ -8,6 +8,6 @@ import (
 
 // OauthClientRepository is a repository interface for application entities.
 type OauthClientRepository interface {
-	Find(ctx context.Context, application *entity.OauthClient) (*entity.OauthClient, error)
-	Save(ctx context.Context, application *entity.OauthClient) error
+	Find(ctx context.Context, client *entity.OauthClient) (*entity.OauthClient, error)
+	Save(ctx context.Context, client *entity.OauthClient) error
 }

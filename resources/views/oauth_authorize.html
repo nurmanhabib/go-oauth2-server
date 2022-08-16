@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Auth</title>
+    <link rel="stylesheet"
+          href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+    />
+    <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="jumbotron">
+            <h1>Authorize</h1>
+            <p>The client {{.name}} would like to perform actions on your behalf.</p>
+
+            <div class="button-groups">
+                <!-- Authorize Button -->
+                <form method="post" action="/oauth/approve?{{.query}}">
+                    <button type="submit" class="btn btn-success btn-approve">Authorize</button>
+                </form>
+
+                <!-- Cancel Button -->
+                <form method="post" action="/oauth/decline">
+                    <button class="btn btn-danger">Cancel</button>
+                </form>
+            </div>
+    </div>
+</div>
+</body>
+</html>

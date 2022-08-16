@@ -10,3 +10,16 @@ func SliceContains(s []string, str string) bool {
 
 	return false
 }
+
+// SliceSubtract is the subtraction of Slice A to Slice B.
+func SliceSubtract(a, b []string) []string {
+	var r []string
+
+	for _, v := range a {
+		if !SliceContains(b, v) {
+			r = append(r, v)
+		}
+	}
+
+	return r
+}

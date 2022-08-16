@@ -18,3 +18,8 @@ type OauthAccessGrant struct {
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }
+
+var (
+	// ErrAccessGrantRevoked is an error when the access grant has been revoke.
+	ErrAccessGrantRevoked = Error("entity.access_grants.revoked")
+)

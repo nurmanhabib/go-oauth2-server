@@ -14,6 +14,10 @@ func NewServer(config *config.Config) *server.Server {
 		srv.SetClientInfoHandler(config.Handler.ClientInfoHandler)
 	}
 
+	if config.Handler.ClientScopeHandler != nil {
+		srv.SetClientScopeHandler(config.Handler.ClientScopeHandler)
+	}
+
 	if config.Handler.UserAuthorizationHandler != nil {
 		srv.SetUserAuthorizationHandler(config.Handler.UserAuthorizationHandler)
 	}

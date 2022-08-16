@@ -19,3 +19,8 @@ type OauthAccessToken struct {
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 }
+
+var (
+	// ErrAccessTokenRevoked is an error when the access token has been revoke.
+	ErrAccessTokenRevoked = Error("entity.access_tokens.is_revoked")
+)
