@@ -8,7 +8,7 @@ import (
 // OauthAccessToken is an OAuth Access Token entity container.
 type OauthAccessToken struct {
 	ID               string
-	UserID           string
+	UserID           sql.NullString
 	OauthClientID    string
 	Token            string
 	ExpiresIn        int

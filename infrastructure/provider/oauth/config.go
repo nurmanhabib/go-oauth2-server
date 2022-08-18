@@ -40,6 +40,17 @@ func NewConfig(dependency *Dependency) *config.Config {
 		config.AllowGrantTypes(
 			oauth2.AuthorizationCode,
 			oauth2.Refreshing,
+			// oauth2.ClientCredentials,
+			// oauth2.Implicit,
+
+			// Deprecated https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-16#section-2.4
+			// oauth2.PasswordCredentials,
+		),
+
+		// Allow Response Types
+		config.AllowResponseTypes(
+			oauth2.Code,
+			// oauth2.Token,
 		),
 
 		// config.WithJWTAccessTokenGenerator("", []byte("00000000"), jwt.SigningMethodHS512),

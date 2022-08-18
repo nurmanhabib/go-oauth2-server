@@ -13,7 +13,8 @@ type Config struct {
 	ClientStorage oauth2.ClientStore
 	TokenStorage  oauth2.TokenStore
 
-	AllowGrantTypes []oauth2.GrantType
+	AllowGrantTypes    []oauth2.GrantType
+	AllowResponseTypes []oauth2.ResponseType
 
 	ManagerAdjustments []ManagerOption
 	ServerAdjustments  []ServerOption

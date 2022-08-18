@@ -88,9 +88,20 @@ func (t *TokenStorage) createAccessGrant(ctx context.Context, info oauth2.TokenI
 }
 
 func (t *TokenStorage) createAccessToken(ctx context.Context, info oauth2.TokenInfo) error {
-	user, err := t.user.Find(ctx, &entity.User{ID: info.GetUserID()})
-	if err != nil {
-		return err
+	var err error
+	var user *entity.User
+	var userID sql.NullString
+
+	user = &entity.User{}
+
+	// If the User ID is empty, then the access token belongs to the client (application).
+	if info.GetUserID() != "" {
+		user, err = t.user.Find(ctx, &entity.User{ID: info.GetUserID()})
+		if err != nil {
+			return err
+		}
+
+		_ = userID.Scan(user.ID)
 	}
 
 	client, err := t.client.Find(ctx, &entity.OauthClient{ID: info.GetClientID()})
@@ -100,7 +111,7 @@ func (t *TokenStorage) createAccessToken(ctx context.Context, info oauth2.TokenI
 
 	err = t.accessToken.Save(ctx, &entity.OauthAccessToken{
 		ID:            uuid.New().String(),
-		UserID:        user.ID,
+		UserID:        userID,
 		OauthClientID: client.ID,
 		Token:         info.GetAccess(),
 		RefreshToken:  info.GetRefresh(),
@@ -201,7 +212,7 @@ func (t *TokenStorage) getByAccessToken(ctx context.Context, find *entity.OauthA
 		return nil, err
 	}
 
-	user, err := t.user.Find(ctx, &entity.User{ID: accessToken.UserID})
+	user, err := t.user.Find(ctx, &entity.User{ID: accessToken.UserID.String})
 	if err != nil {
 		return nil, err
 	}

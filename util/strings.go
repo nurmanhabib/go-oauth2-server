@@ -1,5 +1,7 @@
 package util
 
+import "math/rand"
+
 // SliceContains is a function to make sure a string is in the slice of string.
 func SliceContains(s []string, str string) bool {
 	for _, v := range s {
@@ -22,4 +24,16 @@ func SliceSubtract(a, b []string) []string {
 	}
 
 	return r
+}
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+// RandomAlpha is function to generate random alphabet.
+func RandomAlpha(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+
+	return string(b)
 }
