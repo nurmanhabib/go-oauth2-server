@@ -9,6 +9,7 @@ type Config struct {
 	Repo
 	Handler
 	Generator
+	TokenConfig
 
 	ClientStorage oauth2.ClientStore
 	TokenStorage  oauth2.TokenStore
@@ -26,6 +27,7 @@ func New(options ...Option) *Config {
 
 	defaultMemoryTokenStorage()(conf)
 	defaultClientInfoHandler()(conf)
+	defaultTokenConfig()(conf)
 
 	for _, apply := range options {
 		apply(conf)

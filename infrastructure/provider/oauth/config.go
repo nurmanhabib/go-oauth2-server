@@ -1,6 +1,8 @@
 package oauth
 
 import (
+	"time"
+
 	"github.com/go-oauth2/oauth2/v4"
 	"github.com/nurmanhabib/go-oauth2-server/domain/repository"
 	"github.com/nurmanhabib/go-oauth2-server/infrastructure/provider/oauth/handler"
@@ -52,6 +54,9 @@ func NewConfig(dependency *Dependency) *config.Config {
 			oauth2.Code,
 			// oauth2.Token,
 		),
+
+		config.WithAccessTokenAllGrantExpiry(2*time.Hour),
+		config.WithRefreshTokenAllGrantExpiry(24*7*time.Hour),
 
 		// config.WithJWTAccessTokenGenerator("", []byte("00000000"), jwt.SigningMethodHS512),
 	)

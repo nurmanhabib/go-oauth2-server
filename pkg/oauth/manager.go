@@ -29,6 +29,18 @@ func NewManager(config *config.Config) *manage.Manager {
 		m.MapAccessGenerate(config.Generator.AccessTokenGenerator)
 	}
 
+	if cfg := config.TokenConfig.AuthorizeCodeGrant; cfg != nil {
+		m.SetAuthorizeCodeTokenCfg(cfg)
+	}
+
+	if cfg := config.TokenConfig.PasswordGrant; cfg != nil {
+		m.SetPasswordTokenCfg(cfg)
+	}
+
+	if cfg := config.TokenConfig.ClientGrant; cfg != nil {
+		m.SetClientTokenCfg(cfg)
+	}
+
 	m.SetValidateURIHandler(validateRedirectURI)
 
 	if config.ManagerAdjustments != nil {

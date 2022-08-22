@@ -1,6 +1,15 @@
 # go-oauth2-server
 Scaffolding OAuth 2.0 Server
 
+## Setup .env Configuratation
+
+Please set some configurations such as database connection and others according to your environment.
+You can copy from `.env.example` with the following command:
+
+```
+cp .env.example .env
+```
+
 ## Run Database Migration
 ```
 go run main.go db:migrate
