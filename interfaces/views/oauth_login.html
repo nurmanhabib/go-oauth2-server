@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </head>
 
@@ -13,6 +13,13 @@
 <div class="container">
     <h1>Login In</h1>
     <form action="/login" method="POST">
+        {{ if .error }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            {{ .error }}
+        </div>
+        {{ end }}
         <div class="form-group">
             <label for="email">Email</label>
             <input type="text" class="form-control" name="email" placeholder="Please enter your email">

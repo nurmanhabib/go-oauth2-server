@@ -1,11 +1,15 @@
 package handler
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
-	"path"
+	"net/url"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-oauth2/oauth2/v4"
 	"github.com/go-oauth2/oauth2/v4/server"
 )
 
@@ -17,7 +21,38 @@ func NewOAuthHandler(srv *server.Server) *OAuthHandler {
 	return &OAuthHandler{srv: srv}
 }
 
+func (h *OAuthHandler) redirectToDefaultClient(c *gin.Context) {
+	defaultClientID := os.Getenv("DEFAULT_CLIENT_ID")
+	client, err := h.srv.Manager.GetClient(c, defaultClientID)
+	if err != nil {
+		h.showError(c, err)
+		return
+	}
+
+	domains := strings.Fields(client.GetDomain())
+	if len(domains) == 0 {
+		h.showError(c, fmt.Errorf("missing default redirect uri for client_id [%s]", client.GetID()))
+		return
+	}
+
+	redirectURI := domains[0]
+
+	params := url.Values{
+		"client_id":     {client.GetID()},
+		"redirect_uri":  {redirectURI},
+		"scope":         {"public"},
+		"response_type": {oauth2.Code.String()},
+	}
+
+	c.Redirect(http.StatusFound, "/oauth/authorize?"+params.Encode())
+}
+
 func (h *OAuthHandler) ShowUserConsent(c *gin.Context) {
+	if c.Request.FormValue("client_id") == "" {
+		h.redirectToDefaultClient(c)
+		return
+	}
+
 	authorizeReq, err := h.srv.ValidationAuthorizeRequest(c.Request)
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusUnauthorized)
@@ -30,22 +65,19 @@ func (h *OAuthHandler) ShowUserConsent(c *gin.Context) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(path.Join("interfaces", "views", "oauth_authorize.html"))
-	if err != nil {
-		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+	// Ensures that if it is considered a first-party application,
+	// it is immediately authorized without displaying user consent.
+	if clientApp, ok := client.(interface {
+		IsSuperApp() bool
+	}); ok && clientApp.IsSuperApp() {
+		h.Authorize(c)
 		return
 	}
 
-	data := map[string]interface{}{
+	c.HTML(http.StatusOK, "oauth_authorize.html", gin.H{
 		"name":  client.GetID(),
 		"query": template.URL(c.Request.URL.RawQuery),
-	}
-
-	err = tmpl.Execute(c.Writer, data)
-
-	if err != nil {
-		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-	}
+	})
 }
 
 func (h *OAuthHandler) Authorize(c *gin.Context) {
@@ -55,21 +87,19 @@ func (h *OAuthHandler) Authorize(c *gin.Context) {
 	}
 }
 
+func (h *OAuthHandler) TokenExchange(c *gin.Context) {
+	err := h.srv.HandleTokenRequest(c.Writer, c.Request)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+	}
+}
+
 func (h *OAuthHandler) showError(c *gin.Context, err error) {
-	c.Status(http.StatusBadRequest)
+	var msg string
 
-	tmpl, errTmpl := template.ParseFiles(path.Join("interfaces", "views", "oauth_error.html"))
-	if errTmpl != nil {
-		http.Error(c.Writer, errTmpl.Error(), http.StatusInternalServerError)
-		return
+	if err != nil {
+		msg = err.Error()
 	}
 
-	data := map[string]interface{}{
-		"message": err.Error(),
-	}
-
-	errTmpl = tmpl.Execute(c.Writer, data)
-	if errTmpl != nil {
-		http.Error(c.Writer, errTmpl.Error(), http.StatusInternalServerError)
-	}
+	c.HTML(http.StatusBadRequest, "oauth_error.html", gin.H{"message": msg})
 }

@@ -6,9 +6,11 @@ import (
 	"os"
 
 	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 	"github.com/nurmanhabib/go-oauth2-server/domain/entity"
 	"github.com/nurmanhabib/go-oauth2-server/infrastructure/dao"
 	"github.com/nurmanhabib/go-oauth2-server/infrastructure/oauth"
+	"github.com/nurmanhabib/go-oauth2-server/interfaces/provider"
 	"github.com/nurmanhabib/go-oauth2-server/interfaces/routes"
 	"github.com/nurmanhabib/go-oauth2-server/pkg/passport"
 	"github.com/urfave/cli/v2"
@@ -17,6 +19,11 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
 	dsn := "root:@tcp(127.0.0.1:3306)/go_oauth2?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -38,14 +45,14 @@ func main() {
 	director := passport.NewDirector(builder)
 	srv := director.Build()
 
-	provider := &routes.Provider{
+	prov := &provider.Provider{
 		Repo:   repo,
 		Server: srv,
 	}
 
 	app := cli.NewApp()
 	app.Action = func(ctx *cli.Context) error {
-		router := routes.NewRouter(provider).Init()
+		router := routes.NewRouter(prov).Init()
 
 		appPort := os.Getenv("APP_PORT")
 		if appPort == "" {

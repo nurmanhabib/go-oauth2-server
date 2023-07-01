@@ -17,26 +17,53 @@ func NewUserRepo(db *gorm.DB) repository.UserRepo {
 }
 
 func (u *UserRepo) FindByID(ctx context.Context, id string) (*entity.User, error) {
-	// TODO implement me
-	panic("implement me")
+	var user entity.User
+
+	err := u.db.WithContext(ctx).Take(&user, "id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func (u *UserRepo) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
-	// TODO implement me
-	panic("implement me")
+	var user entity.User
+
+	err := u.db.WithContext(ctx).Take(&user, "email = ?", email).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func (u *UserRepo) Save(ctx context.Context, user *entity.User) error {
-	// TODO implement me
-	panic("implement me")
+	return u.db.WithContext(ctx).Create(&user).Error
 }
 
 func (u *UserRepo) Update(ctx context.Context, user *entity.User, id string) error {
-	// TODO implement me
-	panic("implement me")
+	q := u.db.WithContext(ctx).Where("id = ?", id).Updates(&user)
+	if q.Error != nil {
+		return q.Error
+	}
+
+	if q.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }
 
 func (u *UserRepo) Delete(ctx context.Context, id string) error {
-	// TODO implement me
-	panic("implement me")
+	q := u.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.User{})
+	if q.Error != nil {
+		return q.Error
+	}
+
+	if q.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }

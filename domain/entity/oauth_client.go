@@ -38,6 +38,10 @@ func (o *OAuthClient) IsPublic() bool {
 	return !o.SuperApp
 }
 
+func (o *OAuthClient) IsSuperApp() bool {
+	return o.SuperApp
+}
+
 func (o *OAuthClient) GetUserID() string {
 	return ""
 }
